@@ -1,9 +1,13 @@
-FROM golang:latest
+FROM golang:alpine as build
 
-WORKDIR /go/src/github.com/halo-lab-test-task
+WORKDIR /build
 COPY . .
 
 RUN go mod download
-RUN go build -o test-task ./cmd/server/main.go
+RUN CGO_ENABLED=0 go build -o test-task /build/cmd/server/main.go
+
+FROM scratch
+COPY --from=build /build/test-task /test-task
 EXPOSE 8000
-CMD ["./test-task"]
+CMD ["/test-task"]
+
