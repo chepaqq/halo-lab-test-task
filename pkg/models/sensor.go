@@ -5,7 +5,7 @@ import "time"
 type Coordinates struct {
 	X int `json:"x,omitempty"`
 	Y int `json:"y,omitempty"`
-	Z int `json:"x,omitempty"`
+	Z int `json:"z,omitempty"`
 }
 
 type Sensor struct {
