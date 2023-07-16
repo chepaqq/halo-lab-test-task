@@ -1,6 +1,10 @@
 package main
 
-import "github.com/gin-gonic/gin"
+import (
+	"log"
+
+	"github.com/gin-gonic/gin"
+)
 
 func main() {
 	r := gin.Default()
@@ -9,5 +13,7 @@ func main() {
 			"message": "Hello, world!",
 		})
 	})
-	r.Run()
+	if err := r.Run(); err != nil {
+		log.Fatalln(err.Error())
+	}
 }
