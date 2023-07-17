@@ -3,17 +3,12 @@ package main
 import (
 	"log"
 
-	"github.com/gin-gonic/gin"
+	"github.com/chepaqq99/halo-lab-test-task/pkg/httpserver"
 )
 
 func main() {
-	r := gin.Default()
-	r.GET("/", func(c *gin.Context) {
-		c.JSON(200, gin.H{
-			"message": "Hello, world!",
-		})
-	})
-	if err := r.Run(); err != nil {
+	srv := new(httpserver.Server)
+	if err := srv.Run("8000", nil); err != nil {
 		log.Fatalln(err.Error())
 	}
 }
