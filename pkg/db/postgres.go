@@ -1,6 +1,10 @@
 package db
 
-import "fmt"
+import (
+	"fmt"
+
+	"github.com/jmoiron/sqlx"
+)
 
 type Config struct {
 	Host     string
@@ -11,14 +15,23 @@ type Config struct {
 	SSLMode  string
 }
 
-func ConnectPostgres(cfg Config) {
-	dsn := fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=disable",
+func ConnectPostgres(cfg Config) (*sqlx.DB, error) {
+	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s user=%s password=%s dbname=%s port=%s sslmode=%s",
 		cfg.Host,
 		cfg.Username,
 		cfg.Password,
 		cfg.DBName,
 		cfg.Port,
-	)
-	// TODO: Read configuration from file
-	// TODO: Connect to postgres using sqlx
+		cfg.SSLMode,
+	))
+	if err != nil {
+		return nil, err
+	}
+
+	err = db.Ping()
+	if err != nil {
+		return nil, err
+	}
+
+	return db, nil
 }
