@@ -39,6 +39,14 @@ services:
         "postgres://postgres:qwerty@postgres:5432/test_db?sslmode=disable",
         "up",
       ]
+  cache:
+    image: redis:latest
+    container_name: cache
+    ports:
+      - "${REDIS_PORT}:${REDIS_PORT}"
+    volumes:
+      - cache:/cache
 
 volumes:
   dbdata:
+  cache:
