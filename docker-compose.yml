@@ -44,6 +44,8 @@ services:
     container_name: cache
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
+    environment:
+      REDIS_ARGS: "--requirepass ${REDIS_PASSWORD}"
     volumes:
       - cache:/cache
 
