@@ -24,6 +24,21 @@ services:
       PORT: ${PORT}
     ports:
       - ${PORT}:${PORT}
+  migrate:
+    image: migrate/migrate:latest
+    container_name: migrate
+    depends_on:
+      - "postgres"
+    volumes:
+      - ./schema:/schema
+    command:
+      [
+        "-path",
+        "/schema",
+        "-database",
+        "postgres://postgres:qwerty@postgres:5432/test_db?sslmode=disable",
+        "up",
+      ]
 
 volumes:
   dbdata:
