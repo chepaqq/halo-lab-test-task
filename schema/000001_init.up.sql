@@ -7,8 +7,8 @@ CREATE TABLE
 CREATE TABLE
   sensor (
     index serial not null,
-    group varchar(40) not null,
-    primary key (index, group),
+    group_name varchar(40) not null,
+    primary key (index, group_name),
     x int not null,
     y int not null,
     z int not null,
@@ -17,11 +17,8 @@ CREATE TABLE
 
 CREATE TABLE
   detected_fishes (
-    id serial not null unique,
-    sensor_index int not null,
-    sensor_group varchar(40) not null,
-    foreign key (sensor_index, sensor_group) references sensor (index, group) on delete cascade not null,
-    fish_id int not null,
+    id serial primary key not null unique,
+    fish_id int references fish (id) not null,
     count int not null
   );
 
@@ -30,8 +27,8 @@ CREATE TABLE
     id serial primary key not null unique,
     sensor_index int not null,
     sensor_group varchar(40) not null,
-    foreign key (sensor_index, sensor_group) references sensor (index, group) on delete cascade not null,
-    detected_fishes_id int references detected_fishes (int) on delete cascade not null,
+    foreign key (sensor_index, sensor_group) references sensor (index, group_name),
+    detected_fishes_id int references detected_fishes (id) not null,
     temperature real not null,
     transparency int not null,
     detected_at time not null
@@ -48,7 +45,7 @@ VALUES
   ('Grouper');
 
 INSERT INTO
-  sensor (index, group, x, y, z, data_output_rate)
+  sensor (index, group_name, x, y, z, data_output_rate)
 VALUES
   (1, 'alpha', 10, 20, 30, 5),
   (2, 'alpha', 15, 25, 35, 10),
@@ -57,17 +54,17 @@ VALUES
   (3, 'beta', 30, 40, 50, 8);
 
 INSERT INTO
-  detected_fishes (sensor_index, sensor_group, fish_id, count)
+  detected_fishes (fish_id, count)
 VALUES
-  (1, 'alpha', 1, 12),
-  (1, 'alpha', 2, 4),
-  (2, 'alpha', 1, 8),
-  (2, 'alpha', 3, 6),
-  (2, 'alpha', 5, 10),
-  (1, 'beta', 1, 15),
-  (1, 'beta', 4, 5),
-  (2, 'beta', 2, 3),
-  (3, 'beta', 6, 7);
+  (1, 12),
+  (2, 4),
+  (1, 8),
+  (3, 6),
+  (5, 10),
+  (1, 15),
+  (4, 5),
+  (2, 3),
+  (6, 7);
 
 INSERT INTO
   sensor_detection (
