@@ -8,6 +8,11 @@ import (
 	groupHandler "github.com/chepaqq99/halo-lab-test-task/internal/api/handler/group"
 	groupRepository "github.com/chepaqq99/halo-lab-test-task/internal/api/repository/group"
 	groupService "github.com/chepaqq99/halo-lab-test-task/internal/api/service/group"
+
+	regionHandler "github.com/chepaqq99/halo-lab-test-task/internal/api/handler/region"
+	regionRepository "github.com/chepaqq99/halo-lab-test-task/internal/api/repository/region"
+	regionService "github.com/chepaqq99/halo-lab-test-task/internal/api/service/region"
+
 	"github.com/chepaqq99/halo-lab-test-task/pkg/cache"
 	"github.com/chepaqq99/halo-lab-test-task/pkg/db"
 	"github.com/gin-gonic/gin"
@@ -53,6 +58,10 @@ func InitRoutes() *gin.Engine {
 	groupService := groupService.NewGroupService(groupRepository)
 	groupHandler := groupHandler.NewGroupHandler(groupService)
 
+	regionRepository := regionRepository.NewRegionDB(db)
+	regionService := regionService.NewRegionService(regionRepository)
+	regionHandler := regionHandler.NewRegionHandler(regionService)
+
 	router := gin.New()
 	group := router.Group("/group")
 	{
@@ -63,6 +72,12 @@ func InitRoutes() *gin.Engine {
 			groupName.GET("/species", groupHandler.GetListOfSpecies)
 			groupName.GET("/species/top/:N", groupHandler.GetTopListOfSpecies)
 		}
+	}
+	region := router.Group("/region")
+	{
+		region.GET("temperature/min", regionHandler.GetMinTemperatureInRegion)
+		region.GET("temperature/max", regionHandler.GetMaxTemperatureInRegion)
+
 	}
 
 	return router
