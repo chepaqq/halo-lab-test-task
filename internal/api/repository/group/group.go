@@ -78,3 +78,37 @@ func (r *GroupDB) GetListOfSpecies(groupName string) (map[string]int, error) {
 
 	return detectedFishes, nil
 }
+
+// GetTopListOfSpecies - .
+func (r *GroupDB) GetTopListOfSpecies(groupName string, top int) (map[string]int, error) {
+	detectedFishes := make(map[string]int)
+	query := `SELECT fish.name, count FROM detected_fish
+			JOIN fish ON fish_id = fish.id
+			JOIN sensor_group ON sensor_group.id = sensor_group_id
+			WHERE sensor_group.name = $1
+			ORDER BY detected_fish.count DESC
+			LIMIT $2`
+	rows, err := r.db.Queryx(query, groupName, top)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var fishName string
+		var count int
+
+		err := rows.Scan(&fishName, &count)
+		if err != nil {
+			return nil, err
+		}
+
+		detectedFishes[fishName] = count
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return detectedFishes, nil
+}
