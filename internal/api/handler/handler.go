@@ -45,6 +45,7 @@ func InitRoutes() *gin.Engine {
 		{
 			groupName.GET("/transparency/average", groupHandler.GetAverageTransparency)
 			groupName.GET("/temperature/average", groupHandler.GetAverageTemperature)
+			groupName.GET("/species", groupHandler.GetListOfSpecies)
 		}
 	}
 

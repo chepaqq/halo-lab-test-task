@@ -46,3 +46,35 @@ func (r *GroupDB) GetGroupByName(groupName string) (*models.SensorGroup, error) 
 	}
 	return &group, nil
 }
+
+// GetListOfSpecies - .
+func (r *GroupDB) GetListOfSpecies(groupName string) (map[string]int, error) {
+	detectedFishes := make(map[string]int)
+	query := `SELECT fish.name, count FROM detected_fish
+			JOIN fish ON fish_id = fish.id
+			JOIN sensor_group ON sensor_group.id = sensor_group_id
+			WHERE sensor_group.name = $1`
+	rows, err := r.db.Queryx(query, groupName)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var fishName string
+		var count int
+
+		err := rows.Scan(&fishName, &count)
+		if err != nil {
+			return nil, err
+		}
+
+		detectedFishes[fishName] = count
+	}
+
+	if err := rows.Err(); err != nil {
+		return nil, err
+	}
+
+	return detectedFishes, nil
+}
