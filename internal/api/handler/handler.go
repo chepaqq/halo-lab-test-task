@@ -3,10 +3,12 @@ package handler
 import (
 	"log"
 	"os"
+	"strconv"
 
 	groupHandler "github.com/chepaqq99/halo-lab-test-task/internal/api/handler/group"
 	groupRepository "github.com/chepaqq99/halo-lab-test-task/internal/api/repository/group"
 	groupService "github.com/chepaqq99/halo-lab-test-task/internal/api/service/group"
+	"github.com/chepaqq99/halo-lab-test-task/pkg/cache"
 	"github.com/chepaqq99/halo-lab-test-task/pkg/db"
 	"github.com/gin-gonic/gin"
 
@@ -20,7 +22,7 @@ func InitRoutes() *gin.Engine {
 		log.Fatal("Error loading .env file")
 	}
 
-	cfg := db.Config{
+	cfgDB := db.Config{
 		Username: os.Getenv("POSTGRES_USER"),
 		Password: os.Getenv("POSTGRES_PASSWORD"),
 		Port:     os.Getenv("POSTGRES_PORT"),
@@ -29,12 +31,25 @@ func InitRoutes() *gin.Engine {
 		SSLMode:  os.Getenv("POSTGRES_SSLMODE"),
 	}
 
-	db, err := db.ConnectPostgres(cfg)
+	db, err := db.ConnectPostgres(cfgDB)
 	if err != nil {
 		log.Fatalf("failed to initialize db: %s", err.Error())
 	}
 
-	groupRepository := groupRepository.NewGroupDB(db)
+	redisDB, err := strconv.Atoi(os.Getenv("REDIS_DB"))
+	if err != nil {
+		log.Fatalf("failed to convert string to int: %s", err.Error())
+	}
+
+	cfgCache := cache.Config{
+		Addr:     os.Getenv("REDIS_ADDR"),
+		Password: os.Getenv("REDIS_PASSWORD"),
+		DB:       redisDB,
+	}
+
+	cache := cache.ConnectRedis(cfgCache)
+
+	groupRepository := groupRepository.NewGroupDB(db, cache)
 	groupService := groupService.NewGroupService(groupRepository)
 	groupHandler := groupHandler.NewGroupHandler(groupService)
 

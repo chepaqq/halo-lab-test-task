@@ -1,20 +1,39 @@
 package group
 
 import (
+	"context"
+	"fmt"
+	"strconv"
+	"time"
+
 	"github.com/chepaqq99/halo-lab-test-task/internal/models"
 	"github.com/jmoiron/sqlx"
+	"github.com/redis/go-redis/v9"
 )
 
 type GroupDB struct {
-	db *sqlx.DB
+	db    *sqlx.DB
+	cache *redis.Client
 }
 
-func NewGroupDB(db *sqlx.DB) *GroupDB {
-	return &GroupDB{db: db}
+func NewGroupDB(db *sqlx.DB, cache *redis.Client) *GroupDB {
+	return &GroupDB{db: db, cache: cache}
 }
 
 // GetAverageTransparency - .
 func (r *GroupDB) GetAverageTransparency(groupName string) (float64, error) {
+	// Check if the result is cached
+	cachedResult, err := r.cache.Get(context.Background(), fmt.Sprintf("average_transparency:%s", groupName)).Result()
+	if err == nil {
+		// Result found in cache, return the cached value
+		averageTransparency, err := strconv.ParseFloat(cachedResult, 64)
+		if err != nil {
+			return 0, fmt.Errorf("failed to parse cached result: %s", err)
+		}
+		return averageTransparency, nil
+	}
+
+	// Result not found in cache, fetch from the database
 	var averageTransparency float64
 	query := `SELECT AVG(transparency) FROM sensor
 		JOIN sensor_group g ON g.id = group_id WHERE g.name = $1`
@@ -22,16 +41,40 @@ func (r *GroupDB) GetAverageTransparency(groupName string) (float64, error) {
 		return 0, err
 	}
 
+	// Cache the result
+	err = r.cache.Set(context.Background(), fmt.Sprintf("average_transparency:%s", groupName), averageTransparency, 10*time.Second).Err()
+	if err != nil {
+		return 0, fmt.Errorf("failed to cache result: %s", err)
+	}
+
 	return averageTransparency, nil
 }
 
 // GetAverageTemperature - .
 func (r *GroupDB) GetAverageTemperature(groupName string) (float64, error) {
+	// Check if the result is cached
+	cachedResult, err := r.cache.Get(context.Background(), fmt.Sprintf("average_temperature:%s", groupName)).Result()
+	if err == nil {
+		// Result found in cache, return the cached value
+		averageTemperature, err := strconv.ParseFloat(cachedResult, 64)
+		if err != nil {
+			return 0, fmt.Errorf("failed to parse cached result: %w", err)
+		}
+		return averageTemperature, nil
+	}
+
+	// Result not found in cache, fetch from the database
 	var averageTemperature float64
 	query := `SELECT AVG(temperature) FROM sensor
 		JOIN sensor_group g ON g.id = group_id WHERE g.name = $1`
-	if err := r.db.Get(&averageTemperature, query, groupName); err != nil {
+	if err = r.db.Get(&averageTemperature, query, groupName); err != nil {
 		return 0, err
+	}
+
+	// Cache the result
+	err = r.cache.Set(context.Background(), fmt.Sprintf("average_temperature:%s", groupName), averageTemperature, 10*time.Second).Err()
+	if err != nil {
+		return 0, fmt.Errorf("failed to cache result: %w", err)
 	}
 
 	return averageTemperature, nil
