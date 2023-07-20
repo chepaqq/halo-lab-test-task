@@ -155,3 +155,19 @@ func (r *GroupDB) GetTopListOfSpecies(groupName string, top int) (map[string]int
 
 	return detectedFishes, nil
 }
+
+// Create - .
+func (r *GroupDB) Create(groupName string) (int, error) {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return 0, err
+	}
+	var id int
+	query := `INSERT INTO sensor_group(name) VALUES ($1)`
+	row := tx.QueryRow(query, groupName)
+	if err := row.Scan(&id); err != nil {
+		tx.Rollback()
+		return 0, err
+	}
+	return id, tx.Commit()
+}
