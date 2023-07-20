@@ -166,8 +166,21 @@ func (r *GroupDB) Create(groupName string) (int, error) {
 	query := `INSERT INTO sensor_group(name) VALUES ($1)`
 	row := tx.QueryRow(query, groupName)
 	if err := row.Scan(&id); err != nil {
-		tx.Rollback()
+		err := tx.Rollback()
+		if err != nil {
+			return 0, err
+		}
 		return 0, err
 	}
 	return id, tx.Commit()
+}
+
+// GetLastIDInGroup - .
+func (r *GroupDB) GetLastIDInGroup(groupID int) (int, error) {
+	var lastIndex int
+	query := `SELECT index FROM sensor WHERE group_id = $1 ORDER BY index DESC LIMIT 1`
+	if err := r.db.Get(&lastIndex, query, groupID); err != nil {
+		return 0, err
+	}
+	return lastIndex, nil
 }
