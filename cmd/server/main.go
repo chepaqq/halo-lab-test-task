@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"log"
 	"os"
+	"os/signal"
+	"syscall"
 
 	"github.com/chepaqq99/halo-lab-test-task/internal/api/handler"
 	"github.com/chepaqq99/halo-lab-test-task/internal/generation"
@@ -19,7 +22,17 @@ func main() {
 	}
 	go generation.InitGeneration()
 	srv := new(httpserver.Server)
-	if err := srv.Run(os.Getenv("PORT"), handler.InitRoutes()); err != nil {
-		log.Fatalln(err.Error())
+	go func() {
+		if err := srv.Run(os.Getenv("PORT"), handler.InitRoutes()); err != nil {
+			log.Fatalln(err.Error())
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGTERM, syscall.SIGINT)
+	<-quit
+
+	if err := srv.Shutdown(context.Background()); err != nil {
+		log.Fatalf("error occured on server shutting down: %s", err.Error())
 	}
 }
