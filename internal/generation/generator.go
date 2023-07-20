@@ -29,6 +29,8 @@ var greekLettersName = []string{
 	"rho", "sigma", "tau", "upsilon", "phi", "chi", "psi", "omega",
 }
 
+var fishSpecies = parseFishSpecies()
+
 // InitGeneration - .
 func InitGeneration() {
 	err := godotenv.Load()
@@ -57,13 +59,11 @@ func InitGeneration() {
 	// one-time "kickoff" phase
 	sensors := createGroupsAndSensors(groupService, sensorService, 5)
 
-	fishSpecies := parseFishSpecies()
-	createFishes(sensorService, fishSpecies)
+	createFishes(sensorService)
 
 	// regularly repeated phase
-	sem := make(chan struct{}, 5) // semaphore to control concurrent database operations
 	for i := range sensors {
-		go generateData(&sensors[i], &sensors, &fishSpecies, sensorService, sem)
+		go generateData(&sensors[i], &sensors, sensorService)
 	}
 }
 
@@ -99,7 +99,7 @@ func createGroupsAndSensors(groupService *groupService.GroupService, sensorServi
 	return sensors
 }
 
-func createFishes(sensorService *sensorService.SensorService, fishSpecies []string) {
+func createFishes(sensorService *sensorService.SensorService) {
 	for _, fishSpecie := range fishSpecies {
 		_, _ = sensorService.CreateFish(fishSpecie)
 	}
@@ -138,7 +138,7 @@ func parseFishSpecies() []string {
 	return names
 }
 
-func generateData(sensor *models.Sensor, allSensors *[]models.Sensor, fishSpecies *[]string, sensorService *sensorService.SensorService, sem chan struct{}) {
+func generateData(sensor *models.Sensor, allSensors *[]models.Sensor, sensorService *sensorService.SensorService) {
 	ticker := time.NewTicker(sensor.DataOutputRate)
 	defer ticker.Stop()
 
@@ -162,14 +162,18 @@ func generateData(sensor *models.Sensor, allSensors *[]models.Sensor, fishSpecie
 			}
 		}
 
-		// Acquire semaphore before performing the database update
-		sem <- struct{}{}
 		_, err := sensorService.UpdateSensor(sensor.Index, sensor.GroupID, sensor.Transparency, sensor.Temperature)
-		<-sem // Release semaphore after the database update is complete
-
 		if err != nil {
 			fmt.Println(err.Error())
 		}
+		detectedSpecies := generateDetectedSpecies(fishSpecies)
+		for specie, count := range detectedSpecies {
+			_, _ = sensorService.CreateDetectedFishes(specie, count, sensor.Index, sensor.GroupID)
+			if err != nil {
+				fmt.Println(err.Error())
+			}
+		}
+
 		fmt.Printf("Sensor %d - Temperature: %.2f°C, Transparency: %d%%\n", sensor.Index, sensor.Temperature, sensor.Transparency)
 	}
 }
