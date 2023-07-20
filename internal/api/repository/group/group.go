@@ -162,17 +162,16 @@ func (r *GroupDB) Create(groupName string) (int, error) {
 	if err != nil {
 		return 0, err
 	}
-	var id int
 	query := `INSERT INTO sensor_group(name) VALUES ($1)`
-	row := tx.QueryRow(query, groupName)
-	if err := row.Scan(&id); err != nil {
-		err := tx.Rollback()
-		if err != nil {
-			return 0, err
-		}
+	result, err := tx.Exec(query, groupName)
+	if err != nil {
 		return 0, err
 	}
-	return id, tx.Commit()
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(rowsAffected), tx.Commit()
 }
 
 // GetLastIDInGroup - .
