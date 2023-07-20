@@ -54,14 +54,7 @@ func (s *GroupService) GetTopListOfSpecies(groupName string, top int) (map[strin
 }
 
 func (s *GroupService) CreateGroup(groupName string) (int, error) {
-	group, err := s.repo.GetGroupByName(groupName)
-	if group == nil {
-		return s.repo.Create(groupName)
-	}
-	if err != nil {
-		return 0, err
-	}
-	return 0, nil
+	return s.repo.Create(groupName)
 }
 
 func (s *GroupService) GetLastIDInGroup(groupID int) (int, error) {
