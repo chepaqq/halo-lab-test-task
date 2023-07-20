@@ -9,6 +9,8 @@ type sensorRepository interface {
 	CreateCoordinates(coordinates *models.Coordinates) (int, error)
 	CreateFish(fishName string) (int, error)
 	UpdateSensor(index, groupID, transparency int, temperature float64) (int, error)
+	CreateDetectedFishes(fishID, count, sensorIndex, sensorGroupID int) (int, error)
+	GetFishBySpecie(fishSpecie string) (*models.Fish, error)
 }
 
 type SensorService struct {
@@ -33,4 +35,16 @@ func (s *SensorService) CreateCoordinates(coordinates *models.Coordinates) (int,
 
 func (s *SensorService) CreateFish(fishName string) (int, error) {
 	return s.repo.CreateFish(fishName)
+}
+
+func (s *SensorService) CreateDetectedFishes(fishSpecie string, count, sensorIndex, sensorGroupID int) (int, error) {
+	fish, err := s.GetFishBySpecie(fishSpecie)
+	if err != nil {
+		return 0, err
+	}
+	return s.repo.CreateDetectedFishes(fish.ID, count, sensorIndex, sensorGroupID)
+}
+
+func (s *SensorService) GetFishBySpecie(fishSpecie string) (*models.Fish, error) {
+	return s.repo.GetFishBySpecie(fishSpecie)
 }

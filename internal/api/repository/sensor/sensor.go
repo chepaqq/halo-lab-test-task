@@ -83,3 +83,30 @@ func (r *SensorDB) CreateFish(fishName string) (int, error) {
 	}
 	return int(rowsAffected), tx.Commit()
 }
+
+func (r *SensorDB) CreateDetectedFishes(fishID, count, sensorIndex, sensorGroupID int) (int, error) {
+	tx, err := r.db.Begin()
+	if err != nil {
+		return 0, err
+	}
+	query := `INSERT INTO detected_fish(fish_id, count, sensor_index, sensor_group_id)
+		VALUES ($1, $2, $3, $4)`
+	result, err := tx.Exec(query, fishID, count, sensorIndex, sensorGroupID)
+	if err != nil {
+		return 0, err
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return 0, err
+	}
+	return int(rowsAffected), tx.Commit()
+}
+
+func (r *SensorDB) GetFishBySpecie(fishSpecie string) (*models.Fish, error) {
+	var fish models.Fish
+	query := `SELECT * FROM fish WHERE name = $1`
+	if err := r.db.Get(&fish, query, fishSpecie); err != nil {
+		return &fish, err
+	}
+	return &fish, nil
+}
