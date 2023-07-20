@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 // Coordinates -.
 type Coordinates struct {
 	X int `json:"x,omitempty"`
@@ -15,13 +17,12 @@ type SensorGroup struct {
 
 // Sensor - .
 type Sensor struct {
-	Index          int            `json:"index,omitempty"`
-	GroupID        int            `json:"group_id,omitempty"`
-	Coordinates    Coordinates    `json:"coordinates,omitempty"`
-	DataOutputRate int            `json:"data_output_rate,omitempty"`
-	Temperature    float64        `json:"temperature,omitempty"`
-	Transparency   int            `json:"transparency,omitempty"`
-	DetectedFishes DetectedFishes `json:"detected_fishes,omitempty"`
+	Index          int           `json:"index,omitempty"`
+	GroupID        int           `json:"group_id,omitempty"`
+	Coordinates    Coordinates   `json:"coordinates,omitempty"`
+	DataOutputRate time.Duration `json:"data_output_rate,omitempty"`
+	Temperature    float64       `json:"temperature,omitempty"`
+	Transparency   int           `json:"transparency,omitempty"`
 }
 
 // Fish - .
@@ -32,7 +33,9 @@ type Fish struct {
 
 // DetectedFishes - .
 type DetectedFishes struct {
-	ID     int `json:"id,omitempty"`
-	FishID int `json:"fish_id,omitempty"`
-	Count  int `json:"count,omitempty"`
+	ID            int `json:"id,omitempty"`
+	FishID        int `json:"fish_id,omitempty"`
+	Count         int `json:"count,omitempty"`
+	SensorIndex   int `json:"sensor_index,omitempty"`
+	SensorGroupID int `json:"sensor_group_id,omitempty"`
 }
