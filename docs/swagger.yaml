@@ -1,0 +1,193 @@
+basePath: /
+info:
+  contact: {}
+  title: Halo Lab test task
+paths:
+  /group/{groupName}/species:
+    get:
+      parameters:
+      - description: Name of the group
+        in: path
+        name: groupName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Map of fish species with counts
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "500":
+          description: Internal Server Error
+      summary: Get the full list of fish species (with counts) currently detected
+        inside the group.
+      tags:
+      - group
+  /group/{groupName}/species/top/{N}:
+    get:
+      parameters:
+      - description: Name of the group
+        in: path
+        name: groupName
+        required: true
+        type: string
+      - description: Number of top fish species to retrieve
+        in: path
+        name: "N"
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Map of top fish species with counts
+          schema:
+            additionalProperties:
+              type: integer
+            type: object
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Get the list of top N fish species (with counts) currently detected
+        inside the group.
+      tags:
+      - group
+  /group/{groupName}/temperature/average:
+    get:
+      parameters:
+      - description: Name of the group
+        in: path
+        name: groupName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Average temperature
+          schema:
+            type: number
+        "500":
+          description: Internal Server Error
+      summary: Get the current average temperature inside the group.
+      tags:
+      - group
+  /group/{groupName}/transparency/average:
+    get:
+      parameters:
+      - description: Name of the group
+        in: path
+        name: groupName
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Average transparency
+          schema:
+            type: number
+        "500":
+          description: Internal Server Error
+      summary: Get the current average transparency inside the group.
+      tags:
+      - group
+  /region/temperature/max:
+    get:
+      parameters:
+      - description: Minimum x-coordinate of the region
+        in: query
+        name: xMin
+        required: true
+        type: integer
+      - description: Minimum y-coordinate of the region
+        in: query
+        name: yMin
+        required: true
+        type: integer
+      - description: Minimum z-coordinate of the region
+        in: query
+        name: zMin
+        required: true
+        type: integer
+      - description: Maximum x-coordinate of the region
+        in: query
+        name: xMax
+        required: true
+        type: integer
+      - description: Maximum y-coordinate of the region
+        in: query
+        name: yMax
+        required: true
+        type: integer
+      - description: Maximum z-coordinate of the region
+        in: query
+        name: zMax
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Maximum temperature in the region
+          schema:
+            type: number
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Get the maximum temperature in the specified region.
+      tags:
+      - region
+  /region/temperature/min:
+    get:
+      parameters:
+      - description: Minimum x-coordinate of the region
+        in: query
+        name: xMin
+        required: true
+        type: integer
+      - description: Minimum y-coordinate of the region
+        in: query
+        name: yMin
+        required: true
+        type: integer
+      - description: Minimum z-coordinate of the region
+        in: query
+        name: zMin
+        required: true
+        type: integer
+      - description: Maximum x-coordinate of the region
+        in: query
+        name: xMax
+        required: true
+        type: integer
+      - description: Maximum y-coordinate of the region
+        in: query
+        name: yMax
+        required: true
+        type: integer
+      - description: Maximum z-coordinate of the region
+        in: query
+        name: zMax
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Minimum temperature in the region
+          schema:
+            type: number
+        "400":
+          description: Bad Request
+        "500":
+          description: Internal Server Error
+      summary: Get the minimum temperature in the specified region.
+      tags:
+      - region
+swagger: "2.0"

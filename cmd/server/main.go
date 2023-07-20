@@ -10,6 +10,8 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// @title Halo Lab test task
+// @BasePath /
 func main() {
 	err := godotenv.Load()
 	if err != nil {

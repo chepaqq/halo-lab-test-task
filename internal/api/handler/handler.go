@@ -17,7 +17,10 @@ import (
 	"github.com/chepaqq99/halo-lab-test-task/pkg/db"
 	"github.com/gin-gonic/gin"
 
+	docs "github.com/chepaqq99/halo-lab-test-task/docs"
 	"github.com/joho/godotenv"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 // InitRoutes - .
@@ -63,6 +66,7 @@ func InitRoutes() *gin.Engine {
 	regionHandler := regionHandler.NewRegionHandler(regionService)
 
 	router := gin.New()
+	docs.SwaggerInfo.BasePath = "/"
 	group := router.Group("/group")
 	{
 		groupName := group.Group("/:groupName")
@@ -77,8 +81,8 @@ func InitRoutes() *gin.Engine {
 	{
 		region.GET("temperature/min", regionHandler.GetMinTemperatureInRegion)
 		region.GET("temperature/max", regionHandler.GetMaxTemperatureInRegion)
-
 	}
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	return router
 }
