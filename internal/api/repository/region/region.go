@@ -1,6 +1,7 @@
 package region
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/jmoiron/sqlx"
@@ -26,7 +27,7 @@ func (r *RegionDB) GetMinTemperatureInRegion(xMin, yMin, zMin, xMax, yMax, zMax 
 
 	fmt.Print(query)
 	if err := r.db.Get(&minTemperature, query, xMin, xMax, yMin, yMax, zMin, zMax); err != nil {
-		return 0, err
+		return 0, errors.New("failed to find result: no sensors in these coordinates")
 	}
 
 	return minTemperature, nil
@@ -41,7 +42,7 @@ func (r *RegionDB) GetMaxTemperatureInRegion(xMin, yMin, zMin, xMax, yMax, zMax 
 		AND coordinates.y >= $3 AND coordinates.y <= $4
 		AND coordinates.z >= $5 AND coordinates.z <= $6`
 	if err := r.db.Get(&maxTemperature, query, xMin, xMax, yMin, yMax, zMin, zMax); err != nil {
-		return 0, err
+		return 0, errors.New("failed to find result: no sensors in these coordinates")
 	}
 
 	return maxTemperature, nil
