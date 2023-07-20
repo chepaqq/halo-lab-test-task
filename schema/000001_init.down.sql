@@ -1,8 +1,8 @@
 DROP TABLE IF EXISTS sensor_history;
 
-DROP TABLE IF EXISTS detected_fish_history;
-
 DROP TABLE IF EXISTS detected_fish;
+
+DROP TABLE IF EXISTS detected_fish_history;
 
 DROP TABLE IF EXISTS sensor;
 
