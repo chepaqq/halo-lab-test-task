@@ -1,9 +1,10 @@
 package handler
 
 import (
-	"log"
 	"os"
 	"strconv"
+
+	log "github.com/sirupsen/logrus"
 
 	groupHandler "github.com/chepaqq99/halo-lab-test-task/internal/api/handler/group"
 	groupRepository "github.com/chepaqq99/halo-lab-test-task/internal/api/repository/group"

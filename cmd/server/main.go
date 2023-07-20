@@ -2,10 +2,11 @@ package main
 
 import (
 	"context"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
+
+	log "github.com/sirupsen/logrus"
 
 	"github.com/chepaqq99/halo-lab-test-task/internal/api/handler"
 	"github.com/chepaqq99/halo-lab-test-task/internal/generation"

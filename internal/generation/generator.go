@@ -2,12 +2,13 @@ package generation
 
 import (
 	"fmt"
-	"log"
 	"math"
 	"math/rand"
 	"os"
 	"strings"
 	"time"
+
+	log "github.com/sirupsen/logrus"
 
 	groupRepository "github.com/chepaqq99/halo-lab-test-task/internal/api/repository/group"
 	sensorRepository "github.com/chepaqq99/halo-lab-test-task/internal/api/repository/sensor"
