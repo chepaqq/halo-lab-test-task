@@ -2,6 +2,7 @@ package db
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/jmoiron/sqlx"
 	_ "github.com/lib/pq"
@@ -21,6 +22,9 @@ func ConnectPostgres(cfg Config) (*sqlx.DB, error) {
 		"postgres",
 		fmt.Sprintf("user=%s dbname=%s host=%s password=%s port=%s sslmode=%s", cfg.Username, cfg.DBName, cfg.Host, cfg.Password, cfg.Port, cfg.SSLMode),
 	)
+	db.SetMaxOpenConns(25)
+	db.SetMaxIdleConns(25)
+	db.SetConnMaxLifetime(5 * time.Minute)
 	if err != nil {
 		return nil, err
 	}
